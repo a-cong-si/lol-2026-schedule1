@@ -1,0 +1,82 @@
+{
+  "updateTime": "2026-03-15 10:00:00",
+  "matches": [
+    {
+      "id": 1,
+      "date": "2026-03-16",
+      "time": "21:00",
+      "stage": "group",
+      "group": "A",
+      "team1": "BLG",
+      "team2": "BFX",
+      "venue": "拳头游戏体育馆",
+      "status": "pending"
+    },
+    {
+      "id": 2,
+      "date": "2026-03-17",
+      "time": "19:00",
+      "stage": "group",
+      "group": "A",
+      "team1": "JDG",
+      "team2": "GEN",
+      "venue": "拳头游戏体育馆",
+      "status": "pending"
+    },
+    {
+      "id": 3,
+      "date": "2026-03-18",
+      "time": "21:00",
+      "stage": "group",
+      "group": "B",
+      "team1": "G2",
+      "team2": "LYON",
+      "venue": "拳头游戏体育馆",
+      "status": "pending"
+    },
+    {
+      "id": 4,
+      "date": "2026-03-19",
+      "time": "20:00",
+      "stage": "group",
+      "group": "B",
+      "team1": "TSW",
+      "team2": "LOUD",
+      "venue": "拳头游戏体育馆",
+      "status": "pending"
+    },
+    {
+      "id": 5,
+      "date": "2026-03-20",
+      "time": "21:00",
+      "stage": "knockout",
+      "group": "",
+      "team1": "A1",
+      "team2": "B2",
+      "venue": "拳头游戏体育馆",
+      "status": "pending"
+    },
+    {
+      "id": 6,
+      "date": "2026-03-21",
+      "time": "21:00",
+      "stage": "knockout",
+      "group": "",
+      "team1": "B1",
+      "team2": "A2",
+      "venue": "拳头游戏体育馆",
+      "status": "pending"
+    },
+    {
+      "id": 7,
+      "date": "2026-03-22",
+      "time": "22:00",
+      "stage": "final",
+      "group": "",
+      "team1": "待定",
+      "team2": "待定",
+      "venue": "拳头游戏体育馆",
+      "status": "pending"
+    }
+  ]
+}
