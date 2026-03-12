@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英雄联盟2026全球先锋赛</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- 统一的 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6C5CE7', // 紫色主色调
+                        secondary: '#FD79A8', // 粉色辅助色
+                        dark: '#2D3748',
+                        light: '#F7FAFC',
+                        'primary-dark': '#5B4CCF',
+                        'primary-light': '#8C7AE6',
+                        'secondary-dark': '#E84393',
+                        'secondary-light': '#FD96C2',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-in': 'slideIn 0.5s ease-in-out',
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 5px rgba(108, 92, 231, 0.5)' },
+                            '50%': { boxShadow: '0 0 20px rgba(108, 92, 231, 0.8)' },
+                        }
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                        'neon': '0 0 5px rgba(108, 92, 231, 0.5), 0 0 20px rgba(108, 92, 231, 0.3)',
+                        'neon-pink': '0 0 5px rgba(253, 121, 168, 0.5), 0 0 20px rgba(253, 121, 168, 0.3)',
+                    },
+                    backgroundImage: {
+                        'hero-pattern': "linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://p6-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/e30d9b8b00f64d28b34be61b720a75bb~tplv-a9rns2rl98-image.image?lk3s=8e244e95&rcl=202603122117309233E923986FD35007EB&rrcfp=f06b921b&x-expires=1775913488&x-signature=bMOWWShVegj6R1KF%2Bv6C61l1Rk8%3D')",
+                        'gradient-radial': 'radial-gradient(circle, rgba(108, 92, 231, 0.2) 0%, rgba(29, 233, 182, 0.1) 100%)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+            .text-shadow-sm {
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            }
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+            }
+            .match-card {
+                transition: all 0.3s ease;
+            }
+            .match-card:hover {
+                transform: scale(1.02);
+            }
+            .calendar-day {
+                transition: all 0.2s ease;
+            }
+            .calendar-day:hover {
+                background-color: rgba(108, 92, 231, 0.1);
+            }
+            .calendar-day.has-match:hover {
+                background-color: rgba(108, 92, 231, 0.2);
+            }
+            .progress-bar {
+                transition: width 1s ease-in-out;
+            }
+            .countdown-timer {
+                font-variant-numeric: tabular-nums;
+            }
+            .neon-text {
+                text-shadow: 0 0 5px rgba(108, 92, 231, 0.7), 0 0 10px rgba(108, 92, 231, 0.5);
+            }
+            .neon-text-pink {
+                text-shadow: 0 0 5px rgba(253, 121, 168, 0.7), 0 0 10px rgba(253, 121, 168, 0.5);
+            }
+            .team-logo {
+                transition: all 0.3s ease;
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- 顶部导航栏 -->
+    <header class="bg-primary text-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                    <i class="fa fa-gamepad text-primary text-2xl"></i>
+                </div>
+                <h1 class="text-xl md:text-2xl font-bold text-shadow-sm">2026全球先锋赛</h1>
+            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#calendar" class="hover:text-secondary transition-colors duration-200">赛程日历</a>
+                <a href="#matches" class="hover:text-secondary transition-colors duration-200">赛事列表</a>
+                <a href="#teams" class="hover:text-secondary transition-colors duration-200">参赛队伍</a>
+                <a href="#statistics" class="hover:text-secondary transition-colors duration-200">数据统计</a>
+                <a href="#news" class="hover:text-secondary transition-colors duration-200">赛事动态</a>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-primary-dark px-4 py-2 animate-fade-in">
+            <a href="#calendar" class="block py-2 hover:text-secondary transition-colors duration-200">赛程日历</a>
+            <a href="#matches" class="block py-2 hover:text-secondary transition-colors duration-200">赛事列表</a>
+            <a href="#teams" class="block py-2 hover:text-secondary transition-colors duration-200">参赛队伍</a>
+            <a href="#statistics" class="block py-2 hover:text-secondary transition-colors duration-200">数据统计</a>
+            <a href="#news" class="block py-2 hover:text-secondary transition-colors duration-200">赛事动态</a>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="bg-hero-pattern bg-cover bg-center py-16 md:py-24">
+        <div class="container mx-auto px-4 text-center text-white">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4 text-shadow neon-text">2026全球先锋赛</h2>
+            <p class="text-xl md:text-2xl mb-8 text-shadow-sm">巴西圣保罗 - 3月16日至22日</p>
+            <div class="flex justify-center space-x-4">
+                <a href="#calendar" class="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 shadow-neon">
+                    查看完整赛程
+                </a>
+                <a href="#next-match" class="bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 shadow-neon-pink">
+                    下一场比赛
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 下一场比赛 -->
+    <section id="next-match" class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center">下一场比赛</h2>
+            <div class="bg-white rounded-xl shadow-card overflow-hidden match-card max-w-4xl mx-auto" id="next-match-card">
+                <!-- 下一场比赛内容将动态生成 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 赛程日历 -->
+    <section id="calendar" class="py-12 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center">赛程日历</h2>
+            <div class="bg-white rounded-xl shadow-card p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <button id="prev-month" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg transition-colors duration-300">
+                        <i class="fa fa-chevron-left mr-2"></i>上个月
+                    </button>
+                    <h3 id="current-month" class="text-xl font-bold">2026年3月</h3>
+                    <button id="next-month" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg transition-colors duration-300">
+                        下个月<i class="fa fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-7 gap-2 mb-4">
+                    <div class="text-center font-bold text-gray-600 py-2">日</div>
+                    <div class="text-center font-bold text-gray-600 py-2">一</div>
+                    <div class="text-center font-bold text-gray-600 py-2">二</div>
+                    <div class="text-center font-bold text-gray-600 py-2">三</div>
+                    <div class="text-center font-bold text-gray-600 py-2">四</div>
+                    <div class="text-center font-bold text-gray-600 py-2">五</div>
+                    <div class="text-center font-bold text-gray-600 py-2">六</div>
+                </div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-2">
+                    <!-- 日历内容将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 赛事列表 -->
+    <section id="matches" class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center">赛事列表</h2>
+            
+            <!-- 筛选器 -->
+            <div class="mb-8 bg-gray-100 rounded-lg p-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">阶段</label>
+                        <select id="stage-filter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="all">全部阶段</option>
+                            <option value="group">小组赛</option>
+                            <option value="knockout">淘汰赛</option>
+                            <option value="final">决赛</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">分组</label>
+                        <select id="group-filter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="all">全部分组</option>
+                            <option value="A">A组</option>
+                            <option value="B">B组</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">队伍</label>
+                        <select id="team-filter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="all">全部队伍</option>
+                            <option value="BLG">BLG</option>
+                            <option value="JDG">JDG</option>
+                            <option value="GEN">GEN</option>
+                            <option value="BFX">BFX</option>
+                            <option value="G2">G2</option>
+                            <option value="LYON">LYON</option>
+                            <option value="TSW">TSW</option>
+                            <option value="LOUD">LOUD</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 赛事列表 -->
+            <div id="matches-list" class="space-y-4">
+                <!-- 赛事列表将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 参赛队伍：8支完整队伍 + 稳定LOGO -->
+    <section id="teams" class="py-12 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center">参赛队伍</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- BLG -->
+                <div class="bg-white rounded-xl shadow-card overflow-hidden card-hover">
+                    <div class="h-40 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center p-4">
+                        <img src="https://img.zhutix.com/avatar/1686236896.png" alt="BLG" class="team-logo">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">BLG</h3>
+                        <p class="text-gray-600 mb-4">LPL赛区 1号种子</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">上单</span>
+                                <span class="font-medium">Bin</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">打野</span>
+                                <span class="font-medium">Beichuan</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">中单</span>
+                                <span class="font-medium">Knight</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">下路</span>
+                                <span class="font-medium">Elk</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">辅助</span>
+                                <span class="font-medium">On</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- JDG -->
+                <div class="bg-white rounded-xl shadow-card overflow-hidden card-hover">
+                    <div class="h-40 bg-gradient-to-r from-red-500 to-red-700 flex items-center justify-center p-4">
+                        <img src="https://img.zhutix.com/avatar/1686236922.png" alt="JDG" class="team-logo">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">JDG</h3>
+                        <p class="text-gray-600 mb-4">LPL赛区 2号种子</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">上单</span>
+                                <span class="font-medium">369</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">打野</span>
+                                <span class="font-medium">Kanavi</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">中单</span>
+                                <span class="font-medium">Knight</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">下路</span>
+                                <span class="font-medium">Ruler</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">辅助</span>
+                                <span class="font-medium">Missing</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- GEN -->
+                <div class="bg-white rounded-xl shadow-card overflow-hidden card-hover">
+                    <div class="h-40 bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center p-4">
+                        <img src="https://img.zhutix.com/avatar/1686237005.png" alt="GEN" class="team-logo">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">GEN</h3>
+                        <p class="text-gray-600 mb-4">LCK赛区 1号种子</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">上单</span>
+                                <span class="font-medium">Doran</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">打野</span>
+                                <span class="font-medium">Peanut</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">中单</span>
+                                <span class="font-medium">Chovy</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">下路</span>
+                                <span class="font-medium">Peyz</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">辅助</span>
+                                <span class="font-medium">Lehends</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- BFX -->
+                <div class="bg-white rounded-xl shadow-card overflow-hidden card-hover">
+                    <div class="h-40 bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center p-4">
+                        <img src="https://img.zhutix.com/avatar/1719895668.png" alt="BFX" class="team-logo">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">BFX</h3>
+                        <p class="text-gray-600 mb-4">巴西赛区 1号种子</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">上单</span>
+                                <span class="font-medium">brTT</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">打野</span>
+                                <span class="font-medium">Croc</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">中单</span>
+                                <span class="font-medium">Tinowns</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">下路</span>
+                                <span class="font-medium">Route</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">辅助</span>
+                                <span class="font-medium">Ceos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- G2 -->
+                <div class="bg-white rounded-xl shadow-card overflow-hidden card-hover">
+                    <div class="h-40 bg-gradient-to-r from-black to-gray-800 flex items-center justify-center p-4">
+                        <img src="https://img.zhutix.com/avatar/1686237037.png" alt="G2" class="team-logo">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">G2</h3>
+                        <p class="text-gray-600 mb-4">LEC赛区 1号种子</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">上单</span>
+                                <span class="font-medium">BrokenBlade</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">打野</span>
+                                <span class="font-medium">Yike</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">中单</span>
+                                <span class="font-medium">Caps</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">下路</span>
+                                <span class="font-medium">Hans sama</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">辅助</span>
+                                <span class="font-medium">Mikyx</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- LYON -->
+                <div class="bg-white rounded-xl shadow-card overflow-hidden card-hover">
+                    <div class="h-40 bg-gradient-to-r from-yellow-400 to-yellow-600 flex items-center justify-center p-4">
+                        <img src="https://img.zhutix.com/avatar/1721524226.png" alt="LYON" class="team-logo">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">LYON</h3>
+                        <p class="text-gray-600 mb-4">拉美赛区 1号种子</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">上单</span>
+                                <span class="font-medium">Robo</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">打野</span>
+                                <span class="font-medium">Seiya</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">中单</span>
+                                <span class="font-medium">Prank</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">下路</span>
+                                <span class="font-medium">Klaus</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">辅助</span>
+                                <span class="font-medium">Route</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- TSW -->
+                <div class="bg-white rounded-xl shadow-card overflow-hidden card-hover">
+                    <div class="h-40 bg-gradient-to-r from-green-500 to-green-700 flex items-center justify-center p-4">
+                        <img src="https://img.zhutix.com/avatar/1720659221.png" alt="TSW" class="team-logo">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">TSW</h3>
+                        <p class="text-gray-600 mb-4">PCS赛区 1号种子</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">上单</span>
+                                <span class="font-medium">Rest</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">打野</span>
+                                <span class="font-medium">Junjia</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">中单</span>
+                                <span class="font-medium">Maple</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">下路</span>
+                                <span class="font-medium">Doggo</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">辅助</span>
+                                <span class="font-medium">Kaiwing</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- LOUD -->
+                <div class="bg-white rounded-xl shadow-card overflow-hidden card-hover">
+                    <div class="h-40 bg-gradient-to-r from-red-600 to-orange-500 flex items-center justify-center p-4">
+                        <img src="https://img.zhutix.com/avatar/1719895703.png" alt="LOUD" class="team-logo">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">LOUD</h3>
+                        <p class="text-gray-600 mb-4">巴西赛区 2号种子</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">上单</span>
+                                <span class="font-medium">CuVee</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">打野</span>
+                                <span class="font-medium">Spica</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">中单</span>
+                                <span class="font-medium">Fenix</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">下路</span>
+                                <span class="font-medium">Neon</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">辅助</span>
+                                <span class="font-medium">IgNar</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 底部 -->
+    <footer class="bg-dark text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2026 英雄联盟全球先锋赛 版权所有</p>
+            <p class="mt-2 text-gray-400">数据每日自动更新，来源：英雄联盟官方赛事</p>
+        </div>
+    </footer>
+
+    <!-- 核心JS：稳定LOGO映射 + 全模块适配 -->
+    <script>
+        // 全局赛程数据 + 队伍LOGO映射（全网稳定链接，无跨域）
+        let allMatches = [];
+        let updateTime = "";
+        const teamLogoMap = {
+            BLG: "https://img.zhutix.com/avatar/1686236896.png",
+            JDG: "https://img.zhutix.com/avatar/1686236922.png",
+            GEN: "https://img.zhutix.com/avatar/1686237005.png",
+            BFX: "https://img.zhutix.com/avatar/1719895668.png",
+            G2: "https://img.zhutix.com/avatar/1686237037.png",
+            LYON: "https://img.zhutix.com/avatar/1721524226.png",
+            TSW: "https://img.zhutix.com/avatar/1720659221.png",
+            LOUD: "https://img.zhutix.com/avatar/1719895703.png",
+            待定: "https://img.icons8.com/metro/100/000000/question-mark.png",
+            A1: "https://img.icons8.com/metro/100/000000/1.png",
+            B2: "https://img.icons8.com/metro/100/000000/2.png",
+            B1: "https://img.icons8.com/metro/100/000000/1.png",
+            A2: "https://img.icons8.com/metro/100/000000/2.png"
+        };
+        // 队伍背景色映射（适配LOGO风格）
+        const teamBgMap = {
+            BLG: "bg-blue-100",
+            JDG: "bg-red-100",
+            GEN: "bg-blue-100",
+            BFX: "bg-purple-100",
+            G2: "bg-gray-100",
+            LYON: "bg-yellow-100",
+            TSW: "bg-green-100",
+            LOUD: "bg-orange-100",
+            待定: "bg-gray-100",
+            A1: "bg-gray-100",
+            B2: "bg-gray-100",
+            B1: "bg-gray-100",
+            A2: "bg-gray-100"
+        };
+
+        // 1. 加载赛程数据
+        async function loadMatches() {
+            try {
+                const response = await fetch('./data/matches.json');
+                if (!response.ok) throw new Error("数据加载失败");
+                const data = await response.json();
+                allMatches = data.matches || [];
+                updateTime = data.updateTime || new Date().toLocaleString();
+                
+                // 渲染页面各个模块
+                renderNextMatch();
+                renderMatchesList();
+                renderCalendar();
+                
+                // 显示更新时间
+                console.log(`赛程数据更新于：${updateTime}`);
+            } catch (error) {
+                console.error('加载赛程失败：', error);
+                // 加载本地默认数据（备用）
+                loadDefaultMatches();
+            }
+        }
+
+        // 备用：加载默认赛程数据（防止爬虫失败）
+        function loadDefaultMatches() {
+            allMatches = [
+                {
+                    "id": 1,
+                    "date": "2026-03-16",
+                    "time": "21:00",
+                    "stage": "group",
+                    "group": "A",
+                    "team1": "BLG",
+                    "team2": "BFX",
+                    "venue": "拳头游戏体育馆",
+                    "status": "pending"
+                },
+                {
+                    "id": 2,
+                    "date": "2026-03-17",
+                    "time": "19:00",
+                    "stage": "group",
+                    "group": "A",
+                    "team1": "JDG",
+                    "team2": "GEN",
+                    "venue": "拳头游戏体育馆",
+                    "status": "pending"
+                },
+                {
+                    "id": 3,
+                    "date": "2026-03-18",
+                    "time": "21:00",
+                    "stage": "group",
+                    "group": "B",
+                    "team1": "G2",
+                    "team2": "LYON",
+                    "venue": "拳头游戏体育馆",
+                    "status": "pending"
+                },
+                {
+                    "id": 4,
+                    "date": "2026-03-19",
+                    "time": "20:00",
+                    "stage": "group",
+                    "group": "B",
+                    "team1": "TSW",
+                    "team2": "LOUD",
+                    "venue": "拳头游戏体育馆",
+                    "status": "pending"
+                },
+                {
+                    "id": 5,
+                    "date": "2026-03-20",
+                    "time": "21:00",
+                    "stage": "knockout",
+                    "group": "",
+                    "team1": "A1",
+                    "team2": "B2",
+                    "venue": "拳头游戏体育馆",
+                    "status": "pending"
+                },
+                {
+                    "id": 6,
+                    "date": "2026-03-21",
+                    "time": "21:00",
+                    "stage": "knockout",
+                    "group": "",
+                    "team1": "B1",
+                    "team2": "A2",
+                    "venue": "拳头游戏体育馆",
+                    "status": "pending"
+                },
+                {
+                    "id": 7,
+                    "date": "2026-03-22",
+                    "time": "22:00",
+                    "stage": "final",
+                    "group": "",
+                    "team1": "待定",
+                    "team2": "待定",
+                    "venue": "拳头游戏体育馆",
+                    "status": "pending"
+                }
+            ];
+            renderNextMatch();
+            renderMatchesList();
+            renderCalendar();
+        }
+
+        // 2. 渲染下一场比赛（带稳定LOGO）
+        function renderNextMatch() {
+            const nextMatchCard = document.getElementById('next-match-card');
+            if (!allMatches.length) {
+                nextMatchCard.innerHTML = '<div class="p-6 text-center text-gray-500">暂无赛程数据</div>';
+                return;
+            }
+
+            // 找到下一场未开始的比赛
+            const now = new Date();
+            let nextMatch = null;
+            for (const match of allMatches) {
+                const matchTime = new Date(`${match.date} ${match.time}`);
+                if (matchTime > now && match.status === 'pending') {
+                    nextMatch = match;
+                    break;
+                }
+            }
+            // 如果没有未开始的，取第一个
+            if (!nextMatch) nextMatch = allMatches[0];
+
+            // 计算倒计时
+            const matchTime = new Date(`${nextMatch.date} ${nextMatch.time}`);
+            const countdown = calculateCountdown(matchTime);
+
+            // 渲染HTML（带队伍LOGO）
+            nextMatchCard.innerHTML = `
+                <div class="bg-primary text-white py-3 px-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-sm uppercase tracking-wider">${nextMatch.stage === 'group' ? '小组赛' : nextMatch.stage === 'knockout' ? '淘汰赛' : '决赛'} ${nextMatch.group ? nextMatch.group + '组' : ''}</span>
+                            <h3 class="text-xl font-bold">${nextMatch.date} ${nextMatch.time}</h3>
+                        </div>
+                        <div id="countdown" class="countdown-timer text-right">
+                            <div class="text-sm uppercase tracking-wider">比赛倒计时</div>
+                            <div class="text-xl font-bold" id="countdown-timer">${countdown}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-col md:flex-row items-center justify-between">
+                        <div class="flex flex-col items-center mb-6 md:mb-0">
+                            <span class="text-sm text-gray-500 mb-2">参赛队伍</span>
+                            <div class="w-24 h-24 ${teamBgMap[nextMatch.team1]} rounded-full flex items-center justify-center mb-3 p-2">
+                                <img src="${teamLogoMap[nextMatch.team1]}" alt="${nextMatch.team1}" class="team-logo">
+                            </div>
+                            <span class="font-bold text-lg">${nextMatch.team1}</span>
+                        </div>
+                        <div class="text-center md:text-left mb-6 md:mb-0">
+                            <div class="text-4xl font-bold mb-2">VS</div>
+                            <div class="text-gray-600">${nextMatch.venue}</div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-sm text-gray-500 mb-2">参赛队伍</span>
+                            <div class="w-24 h-24 ${teamBgMap[nextMatch.team2]} rounded-full flex items-center justify-center mb-3 p-2">
+                                <img src="${teamLogoMap[nextMatch.team2]}" alt="${nextMatch.team2}" class="team-logo">
+                            </div>
+                            <span class="font-bold text-lg">${nextMatch.team2}</span>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold mb-2">比赛预测</h4>
+                                <div class="flex items-center">
+                                    <div class="w-1/3 bg-gray-200 rounded-full h-4 mr-3">
+                                        <div class="bg-primary h-4 rounded-full progress-bar" style="width: 60%"></div>
+                                    </div>
+                                    <span class="text-sm">${nextMatch.team1} 胜率 60%</span>
+                                </div>
+                            </div>
+                            <button class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300">
+                                查看详细分析
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 倒计时定时器
+            setInterval(() => {
+                const newCountdown = calculateCountdown(matchTime);
+                document.getElementById('countdown-timer').textContent = newCountdown;
+            }, 1000);
+        }
+
+        // 计算倒计时
+        function calculateCountdown(targetDate) {
+            const now = new Date();
+            const diff = targetDate - now;
+            
+            if (diff <= 0) return "比赛已开始/结束";
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            return `${days}天 ${hours}时 ${minutes}分 ${seconds}秒`;
+        }
+
+        // 3. 渲染赛事列表（带筛选+稳定LOGO）
+        function renderMatchesList() {
+            const matchesList = document.getElementById('matches-list');
+            const stageFilter = document.getElementById('stage-filter').value;
+            const groupFilter = document.getElementById('group-filter').value;
+            const teamFilter = document.getElementById('team-filter').value;
+
+            // 筛选逻辑
+            let filteredMatches = allMatches;
+            if (stageFilter !== 'all') {
+                filteredMatches = filteredMatches.filter(m => m.stage === stageFilter);
+            }
+            if (groupFilter !== 'all') {
+                filteredMatches = filteredMatches.filter(m => m.group === groupFilter);
+            }
+            if (teamFilter !== 'all') {
+                filteredMatches = filteredMatches.filter(m => m.team1 === teamFilter || m.team2 === teamFilter);
+            }
+
+            if (!filteredMatches.length) {
+                matchesList.innerHTML = '<div class="text-center py-8 text-gray-500">暂无匹配的赛程</div>';
+                return;
+            }
+
+            // 渲染筛选后的赛程（带队伍LOGO）
+            matchesList.innerHTML = '';
+            filteredMatches.forEach(match => {
+                const matchCard = `
+                    <div class="bg-white rounded-xl shadow-card p-4 match-card">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
+                                ${match.group ? match.group + '组 - ' : ''}${match.stage === 'group' ? '小组赛' : match.stage === 'knockout' ? '淘汰赛' : '决赛'}
+                            </span>
+                            <span class="text-gray-500 text-sm">${match.date} ${match.time}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 ${teamBgMap[match.team1]} rounded-full flex items-center justify-center mr-3">
+                                    <img src="${teamLogoMap[match.team1]}" alt="${match.team1}" class="w-8 h-8 object-contain">
+                                </div>
+                                <span class="font-bold">${match.team1}</span>
+                            </div>
+                            <span class="text-xl font-bold">VS</span>
+                            <div class="flex items-center">
+                                <span class="font-bold">${match.team2}</span>
+                                <div class="w-12 h-12 ${teamBgMap[match.team2]} rounded-full flex items-center justify-center ml-3">
+                                    <img src="${teamLogoMap[match.team2]}" alt="${match.team2}" class="w-8 h-8 object-contain">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-sm text-gray-600">
+                            场馆：${match.venue} | 状态：${match.status === 'pending' ? '未开始' : match.status === 'finished' ? '已结束' : '进行中'}
+                        </div>
+                    </div>
+                `;
+                matchesList.innerHTML += matchCard;
+            });
+        }
+
+        // 4. 渲染赛程日历
+        function renderCalendar() {
+            const calendarGrid = document.getElementById('calendar-grid');
+            const currentMonthEl = document.getElementById('current-month');
+            
+            // 固定显示2026年3月（赛事月份）
+            const year = 2026;
+            const month = 2; // 0=1月，2=3月
+            currentMonthEl.textContent = `${year}年3月`;
+
+            // 获取3月1日是星期几
+            const firstDay = new Date(year, month, 1).getDay();
+            // 3月的天数
+            const daysInMonth = 31;
+
+            // 清空日历
+            calendarGrid.innerHTML = '';
+
+            // 填充月初空白
+            for (let i = 0; i < firstDay; i++) {
+                calendarGrid.innerHTML += '<div class="h-20 bg-gray-50 rounded-lg"></div>';
+            }
+
+            // 填充日期
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-03-${day.toString().padStart(2, '0')}`;
+                // 检查当天是否有比赛
+                const hasMatch = allMatches.some(m => m.date === dateStr);
+                
+                calendarGrid.innerHTML += `
+                    <div class="h-20 bg-white rounded-lg p-2 border ${hasMatch ? 'border-primary calendar-day has-match' : 'calendar-day'}">
+                        <div class="font-bold ${hasMatch ? 'text-primary' : ''}">${day}</div>
+                        ${hasMatch ? '<div class="mt-1 text-xs text-primary">有比赛</div>' : ''}
+                    </div>
+                `;
+            }
+        }
+
+        // 5. 绑定筛选器事件
+        document.getElementById('stage-filter').addEventListener('change', renderMatchesList);
+        document.getElementById('group-filter').addEventListener('change', renderMatchesList);
+        document.getElementById('team-filter').addEventListener('change', renderMatchesList);
+
+        // 6. 移动端菜单切换
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 页面加载时执行
+        window.onload = function() {
+            loadMatches();
+        };
+    </script>
+</body>
+</html>
